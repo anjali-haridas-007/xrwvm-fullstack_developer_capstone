@@ -64,10 +64,13 @@ def login_user(request):
 # Create a `add_review` view to submit a review
 # def add_review(request):
 # ...
+
+
 def logout_request(request):
     logout(request)
     data = {"userName": ""}
     return JsonResponse(data)
+
 
 @csrf_exempt
 def registration(request):
@@ -100,24 +103,28 @@ def registration(request):
             "userName": username,
             "status": "Authenticated"
         })
+
+
 def get_dealerships(request, state="All"):
-    if(state == "All"):
+    if (state == "All"):
         endpoint = "/fetchDealers"
     else:
         endpoint = "/fetchDealers/" + state
     dealerships = get_request(endpoint)
     return JsonResponse({"status": 200, "dealers": dealerships})
 
+
 def get_dealer_details(request, dealer_id):
-    if(dealer_id):
+    if (dealer_id):
         endpoint = "/fetchDealer/" + str(dealer_id)
         dealer = get_request(endpoint)
         return JsonResponse({"status": 200, "dealer": dealer})
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
+
 def get_dealer_reviews(request, dealer_id):
-    if(dealer_id):
+    if (dealer_id):
         endpoint = "/fetchReviews/dealer/" + str(dealer_id)
         reviews = get_request(endpoint)
         for review_detail in reviews:
@@ -128,13 +135,14 @@ def get_dealer_reviews(request, dealer_id):
     else:
         return JsonResponse({"status": 400, "message": "Bad Request"})
 
+
 def add_review(request):
-    if(request.user.is_anonymous == False):
+    if not request.user.is_anonymous:
         data = json.loads(request.body)
         try:
-            response = post_review(data)
+            post_review(data)
             return JsonResponse({"status": 200})
-        except:
+        except BaseException:
             return JsonResponse({
                 "status": 401,
                 "message": "Error in posting review"
